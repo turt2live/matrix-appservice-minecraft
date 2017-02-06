@@ -22,31 +22,31 @@ Minecraft bridge for [[Matrix]](https://matrix.org).
 **Before you begin:** A Synapse server is required. The instructions here assume that Synapse server is a default setup.
 
 1. Clone this repository and install the dependencies
-```
-git clone https://github.com/turt2live/matrix-appservice-minecraft
-cd matrix-appservice-minecraft 
-npm install
-```
+   ```
+   git clone https://github.com/turt2live/matrix-appservice-minecraft
+   cd matrix-appservice-minecraft 
+   npm install
+   ```
 
 2. Copy `config.sample.yaml` to `config.yaml` and fill in the appropriate fields
 3. Generate the registration file
-```
-node minecraft-as.js -r -u "http://localhost:9000"
-```
-*Note:* The default URL to run the appservice at is `http://localhost:9000`. If you have other appservices, or other requirements, pick an appropriate hostname and port.
+   ```
+   node minecraft-as.js -r -u "http://localhost:9000"
+   ```
+   *Note:* The default URL to run the appservice at is `http://localhost:9000`. If you have other appservices, or other requirements, pick an appropriate hostname and port.
 
 4. Copy/symlink the registration file to your Synapse directory
-```
-cd ~/.synapse
-ln -s ../matrix-appservice-matrix/matrix-registration.yaml matrix-registration.yaml
-```
+   ```
+   cd ~/.synapse
+   ln -s ../matrix-appservice-matrix/matrix-registration.yaml matrix-registration.yaml
+   ```
 
 5. Add the registration file to your `homeserver.yaml`
-```
-...
-app_service_config_files: ["minecraft-registration.yaml"]
-...
-```
+   ```
+   ...
+   app_service_config_files: ["minecraft-registration.yaml"]
+   ...
+   ```
 
 6. Restart synapse (`synctl restart`, for example)
 
