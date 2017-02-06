@@ -1,5 +1,8 @@
 /.idea
 
+config.yaml
+minecraft-registration.yaml
+
 # Logs
 logs
 *.log

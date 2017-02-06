@@ -1,0 +1,7 @@
+bridge:
+  domain: localhost
+  homeserverUrl: http://localhost:8008
+
+minecraft:
+  mojang_username: "my_account@example.com"
+  mojang_password: "MySecretPasswordHere"
