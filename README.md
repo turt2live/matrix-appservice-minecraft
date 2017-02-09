@@ -60,9 +60,19 @@ The bridge should start working shortly afterwards.
 
 ## Linking a Minecraft server to a room
 
-To join a server such as `myserver.com`, join the room `#minecraft_myserver.com:domain.com`.
+#### When your homeserver doesn't have the bridge running
 
-If the server has a custom port (not 25565), join `#minecraft_myserver.com_12345:domain.com` where 12345 is the port number.
+Open a 1:1 conversation with `@_minecraft:t2bot.io` and send the message `!bridge <room id> <server name[:port]>`.
+
+For example, `!bridge !kBDEQKODhuvfjxDMAl:t2l.io my-minecraft-server.com:12345`.
+
+The room must be public (so the bridge can join and start bridging users)
+
+#### When your homeserver has the bridge running
+
+To join a server such as `myserver.com`, join the room `#_minecraft_myserver.com:domain.com`.
+
+If the server has a custom port (not 25565), join `#_minecraft_myserver.com_12345:domain.com` where 12345 is the port number.
  
 # General information and stuff
 

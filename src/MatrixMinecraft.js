@@ -1,5 +1,6 @@
 var uuidCache = require('./UuidCache');
 var util = require('./utils');
+var RoomHandler = require('./RoomHandler');
 var RemoteUser = require('matrix-appservice-bridge').RemoteUser;
 
 /**
@@ -8,8 +9,23 @@ var RemoteUser = require('matrix-appservice-bridge').RemoteUser;
  */
 class MatrixMinecraft {
 
-    constructor(bridge){
+    constructor(bridge, mcConfig) {
         this._bridge = bridge;
+        this._mcConfig = mcConfig;
+        this._roomMap = {}; // { roomId: RoomHandler }
+    }
+
+    start() {
+        // Doesn't actually need to do anything at this point in time, so we'll just no-op our way along
+        return new Promise((resolve, reject)=> resolve());
+    }
+
+    bindRoom(roomId) {
+        if (!this._roomMap.hasOwnProperty(roomId)) {
+            var roomHandler = new RoomHandler(this, roomId);
+            roomHandler.start();
+            this._roomMap[roomId] = roomHandler;
+        } else throw new Error("Room is already bound: " + roomId);
     }
 
     sendMessage(fromUser, roomId, messageContent) {
@@ -31,7 +47,7 @@ class MatrixMinecraft {
                         url: mxcUrl,
                         remote: new RemoteUser(userId)
                     };
-                }, error=>{
+                }, error=> {
                     reject(error);
                 })
             }, error => {

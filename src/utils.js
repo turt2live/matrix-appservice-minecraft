@@ -1,12 +1,12 @@
 // File based on the following implementation of utils.js in matrix-appservice-twitter by Half-Shot:
 // https://github.com/Half-Shot/matrix-appservice-twitter/blob/6fc01588e51a9eb9a32e14a6b0338abfd7cc32ea/src/util.js
 
-var https   = require('https');
-var http   = require('http');
+var https = require('https');
+var http = require('http');
 
-var Buffer  = require("buffer").Buffer;
-var log     = require('npmlog');
-var mime    = require('mime');
+var Buffer = require("buffer").Buffer;
+var log = require('npmlog');
+var mime = require('mime');
 
 /**
  Utility module for regularly used functions.
@@ -22,7 +22,7 @@ var mime    = require('mime');
  * @param  {type} [name]      Name of the file. Will use the URL filename otherwise.
  * @return {Promise<string>}  Promise resolving with a MXC URL.
  */
-function uploadContentFromUrl (bridge, url, id, name) {
+function uploadContentFromUrl(bridge, url, id, name) {
     var contenttype;
     id = id || null;
     name = name || null;
@@ -31,10 +31,10 @@ function uploadContentFromUrl (bridge, url, id, name) {
         var ht = url.startsWith("https") ? https : http;
 
         ht.get((url), (res) => {
-            if(res.headers.hasOwnProperty("content-type")) {
+            if (res.headers.hasOwnProperty("content-type")) {
                 contenttype = res.headers["content-type"];
             }
-            else{
+            else {
                 log.info("No content-type given by server, guessing based on file name.");
                 contenttype = mime.lookup(url);
             }
@@ -44,12 +44,12 @@ function uploadContentFromUrl (bridge, url, id, name) {
                 name = name[name.length - 1];
             }
             var size = parseInt(res.headers["content-length"]);
-            if(isNaN(size)) {
+            if (isNaN(size)) {
                 reject("Content-Length was not an integer, which is weird.");
                 return;
             }
             var buffer;
-            if(Buffer.alloc) {//Since 5.10
+            if (Buffer.alloc) {//Since 5.10
                 buffer = Buffer.alloc(size);
             }
             else {//Deprecated
@@ -69,7 +69,7 @@ function uploadContentFromUrl (bridge, url, id, name) {
             });
         })
     }).then((buffer) => {
-        if(typeof id == "string" || id == null) {
+        if (typeof id == "string" || id == null) {
             id = bridge.getIntent(id);
         }
         return id.getClient().uploadContent({

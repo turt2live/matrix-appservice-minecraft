@@ -4,7 +4,7 @@ var striptags = require('striptags');
 /**
  * Provides a generic public interface to process room-related actions with respect to Matrix.
  */
-class RoomHandler{
+class RoomHandler {
 
     constructor(matrixApp, roomId) {
         this._matrixApp = matrixApp;
@@ -12,8 +12,8 @@ class RoomHandler{
         this._userMap = {};
     }
 
-    sendMessage(userId, htmlMessage, msgType){
-        if(!this._userMap.hasOwnProperty(userId)) {
+    sendMessage(userId, htmlMessage, msgType) {
+        if (!this._userMap.hasOwnProperty(userId)) {
             this._userMap[userId] = this._createUser(userId);
         }
 
