@@ -2,6 +2,9 @@
 
 config.yaml
 minecraft-registration.yaml
+appservice-registration-minecraft.yaml
+rooms.db
+users.db
 
 # Logs
 logs

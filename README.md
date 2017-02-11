@@ -31,20 +31,20 @@ Minecraft bridge for [[Matrix]](https://matrix.org).
 2. Copy `config.sample.yaml` to `config.yaml` and fill in the appropriate fields
 3. Generate the registration file
    ```
-   node minecraft-as.js -r -u "http://localhost:9000"
+   node app.js -r -u "http://localhost:9000" -c config.yaml
    ```
    *Note:* The default URL to run the appservice at is `http://localhost:9000`. If you have other appservices, or other requirements, pick an appropriate hostname and port.
 
 4. Copy/symlink the registration file to your Synapse directory
    ```
    cd ~/.synapse
-   ln -s ../matrix-appservice-matrix/matrix-registration.yaml matrix-registration.yaml
+   ln -s ../matrix-appservice-minecraft/appservice-registration-minecraft.yaml appservice-registration-minecraft.yaml
    ```
 
 5. Add the registration file to your `homeserver.yaml`
    ```
    ...
-   app_service_config_files: ["minecraft-registration.yaml"]
+   app_service_config_files: ["appservice-registration-minecraft.yaml"]
    ...
    ```
 
@@ -52,7 +52,7 @@ Minecraft bridge for [[Matrix]](https://matrix.org).
 
 # Running
 
-Using the port specified during install (`9000` by default), use `node minecraft-as.js -p 9000 -c config.yaml` from the repository directory.
+Using the port specified during install (`9000` by default), use `node app.js -p 9000 -c config.yaml` from the repository directory.
 
 The bridge should start working shortly afterwards.
 

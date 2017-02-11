@@ -1,0 +1,22 @@
+"$schema": "http://json-schema.org/draft-04/schema#"
+type: "object"
+properties:
+  homeserver:
+    type: "object"
+    properties:
+      domain:
+        type: "string"
+      url:
+        type: "string"
+      mediaUrl:
+        type: "string"
+  mcBridge:
+    type: "object"
+    properties:
+      mojangAccount:
+        type: "object"
+        properties:
+          username:
+            type: "string"
+          password:
+            type: "string"

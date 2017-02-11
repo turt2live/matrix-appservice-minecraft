@@ -3,7 +3,6 @@
 
 var https = require('https');
 var http = require('http');
-
 var Buffer = require("buffer").Buffer;
 var log = require('npmlog');
 var mime = require('mime');
@@ -16,11 +15,11 @@ var mime = require('mime');
  * uploadContentFromUrl - Upload content from a given URL to the homeserver
  * and return a MXC URL.
  *
- * @param  {type} bridge      The bridge object of this application
- * @param  {type} url         The URL to be downloaded from.
- * @param  {type} [id]        Either the ID of the uploader, or a Intent object
- * @param  {type} [name]      Name of the file. Will use the URL filename otherwise.
- * @return {Promise<string>}  Promise resolving with a MXC URL.
+ * @param  bridge the bridge object of this application
+ * @param  {string} url the URL to be downloaded from.
+ * @param  {string} [id] either the ID of the uploader, or a Intent object - optional.
+ * @param  {string} [name] name of the file. Will use the URL filename otherwise - optional.
+ * @return {Promise<string>} Promise resolving with a MXC URL.
  */
 function uploadContentFromUrl(bridge, url, id, name) {
     var contenttype;
@@ -33,8 +32,7 @@ function uploadContentFromUrl(bridge, url, id, name) {
         ht.get((url), (res) => {
             if (res.headers.hasOwnProperty("content-type")) {
                 contenttype = res.headers["content-type"];
-            }
-            else {
+            } else {
                 log.info("No content-type given by server, guessing based on file name.");
                 contenttype = mime.lookup(url);
             }
@@ -51,8 +49,7 @@ function uploadContentFromUrl(bridge, url, id, name) {
             var buffer;
             if (Buffer.alloc) {//Since 5.10
                 buffer = Buffer.alloc(size);
-            }
-            else {//Deprecated
+            } else {//Deprecated
                 buffer = new Buffer(size);
             }
 
@@ -83,10 +80,9 @@ function uploadContentFromUrl(bridge, url, id, name) {
         return content_uri;
     }).catch(function (reason) {
         log.error("UploadContent", "Failed to upload content:\n%s", reason)
-    })
-
+    });
 }
 
 module.exports = {
     uploadContentFromUrl: uploadContentFromUrl
-}
+};
