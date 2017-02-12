@@ -3,6 +3,9 @@ var AppServiceRegistration = require("matrix-appservice-bridge").AppServiceRegis
 var log = require("npmlog");
 var path = require("path");
 var MinecraftBridge = require("./src/MinecraftBridge");
+var LocalStorage = require("node-localstorage").LocalStorage;
+
+global.localStorage = new LocalStorage("./account_data");
 
 new Cli({
     registrationPath: "appservice-registration-minecraft.yaml",

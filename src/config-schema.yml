@@ -20,3 +20,10 @@ properties:
             type: "string"
           password:
             type: "string"
+      appearance:
+        type: "object"
+        properties:
+          displayName:
+            type: "string"
+          avatarUrl:
+            type: "string"

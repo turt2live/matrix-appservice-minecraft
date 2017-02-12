@@ -18,3 +18,8 @@ mcBridge:
   mojangAccount:
     username: "myemail@example.com"
     password: "MySecretPassw0rd"
+
+  # Appearance options for the Matrix bot
+  appearance:
+    displayName: "Minecraft Bridge"
+    avatarUrl: "http://i.imgur.com/ELbV0Af.png" # grass block

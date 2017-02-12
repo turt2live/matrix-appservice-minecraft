@@ -15,9 +15,9 @@ var mime = require('mime');
  * uploadContentFromUrl - Upload content from a given URL to the homeserver
  * and return a MXC URL.
  *
- * @param  bridge the bridge object of this application
+ * @param  {Bridge} bridge the bridge object of this application
  * @param  {string} url the URL to be downloaded from.
- * @param  {string} [id] either the ID of the uploader, or a Intent object - optional.
+ * @param  {string|Intent} [id] either the ID of the uploader, or a Intent object - optional.
  * @param  {string} [name] name of the file. Will use the URL filename otherwise - optional.
  * @return {Promise<string>} Promise resolving with a MXC URL.
  */
