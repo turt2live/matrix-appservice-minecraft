@@ -1,4 +1,5 @@
 var log = require("npmlog");
+var MinecraftServer = require("./MinecraftServer");
 
 /**
  * Abstracts some data storage actions away from the implementation
@@ -52,6 +53,27 @@ class DataStore {
     }
 
     /**
+     * Gets all the Matrix rooms bound to a Minecraft Server
+     * @param {MinecraftServer} mcServer the server to lookup rooms for
+     * @returns {Promise<MatrixRoom[]>} a promise that resolves to an array of Matrix room IDs (can be empty)
+     */
+    getMatrixRoomsForServer(mcServer) {
+        return new Promise((resolve, reject) => {
+            resolve(this._roomStore.getLinkedMatrixRooms(mcServer.getHostname() + " " + mcServer.getPort()));
+        });
+    }
+
+    /**
+     * Gets all Minecraft Servers bound to a given Matrix Room ID
+     * @param {String} roomId the matrix room id
+     * @returns {Promise<MinecraftServer[]>} a promise that resolves to the servers this room id is bound to (can be empty)
+     */
+    getServersForRoom(roomId) {
+        //noinspection JSCheckFunctionSignatures - IntelliJ doesn't seem to be able to figure it out
+        return this._roomStore.getLinkedRemoteRooms(roomId).then(remoteRooms => MinecraftServer.createServersFromRemote(remoteRooms));
+    }
+
+    /**
      * Creates a room mapping ID for a Matrix room and a Minecraft Server
      * @param {string} roomId the Matrix room ID
      * @param {MinecraftServer} mcServer the minecraft server
@@ -68,7 +90,7 @@ class DataStore {
      * @param {MatrixRoom} mtxRoom the matrix room
      * @param {MinecraftServer} mcServer the Minecraft server information
      * @param {string} origin the origin of the mapping (provision, alias, or join)
-     * @return {Promise}
+     * @return {Promise} a promise that resolves when the room has been stored
      */
     storeRoom(mtxRoom, mcServer, origin) {
         if (typeof origin !== 'string') {
@@ -108,7 +130,7 @@ class DataStore {
      * @param {string} roomId the Matrix room ID
      * @param {MinecraftServer} mcServer the Minecraft server container information
      * @param {string} origin the origin for the mapping ( provision, alias, or join)
-     * @return {Promise}
+     * @return {Promise} a promise that resolves when the room has been removed
      */
     removeRoom(roomId, mcServer, origin) {
         if (typeof origin !== 'undefined' && typeof origin !== 'string') {

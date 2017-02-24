@@ -1,4 +1,5 @@
 var RemoteRoom = require("matrix-appservice-bridge").RemoteRoom;
+var mcutils = require("mc-utils");
 
 /**
  * Represents a Minecraft server
@@ -12,6 +13,7 @@ class MinecraftServer extends RemoteRoom {
      */
     constructor(hostname, port) {
         if (!port) port = 25565;
+        port = parseInt(port);
 
         super(hostname + " " + port, {
             hostname: hostname,
@@ -26,7 +28,7 @@ class MinecraftServer extends RemoteRoom {
      * Gets the hostname of the server
      * @returns {string} The server's hostname
      */
-    public getHostname() {
+    getHostname() {
         return this.get("hostname");
     }
 
@@ -34,8 +36,57 @@ class MinecraftServer extends RemoteRoom {
      * Gets the port for the server (default is 25565)
      * @returns {number} The server's port
      */
-    public getPort() {
+    getPort() {
         return this.get("port");
+    }
+
+    /**
+     * Pings the server
+     * @returns {Promise<{ motd: string, favicon_b64: string}>} a promise that resolves to the ping response. Rejected if offline
+     */
+    ping() {
+        return new Promise((resolve, reject)=>{
+            mcutils.ping(this.getHostname(), this.getPort(), function(err, response) {
+                if(err) reject(err);
+                else {
+                    resolve({
+                        motd: response.description,
+                        favicon_b64: response.favicon
+                    });
+                }
+            }, 3000);
+        });
+    }
+
+    /**
+     * Gets the "friendly" name for this server.
+     * Examples:
+     * * mc.turt2live.com
+     * * mc.turt2live.com:32221
+     * @returns {string} the server's friendly name
+     */
+    friendlyName() {
+        var hostname = this.getHostname();
+
+        if(this.getPort()!=25565)
+            hostname+=":"+this.getPort();
+
+        return hostname;
+    }
+
+    /**
+     * Creates MinecraftServers from remote rooms
+     * @param {RemoteRoom[]} remoteRooms the matrix bridge remote rooms
+     * @returns {MinecraftServer[]} the minecraft servers
+     */
+    static createServersFromRemote(remoteRooms) {
+        var newRooms = [];
+
+        for(var room of remoteRooms) {
+            newRooms.push(new MinecraftServer(room.get("hostname"), room.get("port")));
+        }
+
+        return newRooms;
     }
 }
 

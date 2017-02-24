@@ -6,6 +6,7 @@ var http = require('http');
 var Buffer = require("buffer").Buffer;
 var log = require('npmlog');
 var mime = require('mime');
+var parseDataUri = require("parse-data-uri");
 
 /**
  Utility module for regularly used functions.
@@ -83,6 +84,32 @@ function uploadContentFromUrl(bridge, url, id, name) {
     });
 }
 
+/**
+ * Uploads the content contained in a data uri string to the homeserver
+ *
+ * @param  {Bridge} bridge the bridge object of this application
+ * @param  {string} uri the data URI to upload
+ * @param  {string} id either the ID of the uploader
+ * @param  {string} [name] name of the file. Defaults to 'file'.
+ * @return {Promise<string>} Promise resolving with a MXC URL.
+ */
+function uploadContentFromDataUri(bridge, id, uri, name) {
+    if (!name || typeof(name) !== "string") name = "file";
+    var parsed = parseDataUri(uri);
+    return bridge.getIntent(id).getClient().uploadContent({
+        stream: parsed.data,
+        name: name,
+        type: parsed.mimeType
+    }).then(response=> {
+        var content_uri = JSON.parse(response).content_uri;
+        log.info("uploadContentFromDataUri", "Media uploaded to %s", content_uri);
+        return content_uri;
+    }).catch(function (reason) {
+        log.error("UploadContent", "Failed to upload content:\n%s", reason)
+    });
+}
+
 module.exports = {
-    uploadContentFromUrl: uploadContentFromUrl
+    uploadContentFromUrl: uploadContentFromUrl,
+    uploadContentFromDataUri: uploadContentFromDataUri
 };

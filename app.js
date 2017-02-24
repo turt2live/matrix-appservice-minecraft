@@ -5,7 +5,7 @@ var path = require("path");
 var MinecraftBridge = require("./src/MinecraftBridge");
 var LocalStorage = require("node-localstorage").LocalStorage;
 
-global.localStorage = new LocalStorage("./account_data");
+global.localStorage = new LocalStorage("./account_data"); // TODO: Should probably replace localstorage with a real database
 
 new Cli({
     registrationPath: "appservice-registration-minecraft.yaml",
@@ -38,8 +38,8 @@ new Cli({
             registration.setSenderLocalpart("_minecraft");
         }
 
-        registration.addRegexPattern("users", "_minecraft.*");
-        registration.addRegexPattern("aliases", "_minecraft.*");
+        registration.addRegexPattern("users", "@_minecraft.*");
+        registration.addRegexPattern("aliases", "#_minecraft.*");
 
         callback(registration);
     },
