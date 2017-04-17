@@ -2,6 +2,8 @@
 
 Minecraft bridge for [[Matrix]](https://matrix.org).
 
+Matrix room: [#minecraft-bridge:matrix.org](https://matrix.to/#/#minecraft-bridge:matrix.org)
+
 # Requirements
 
 * [NodeJS](https://nodejs.org/en/) (`v6.9.2` or higher recommended)
