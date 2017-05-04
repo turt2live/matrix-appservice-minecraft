@@ -5,6 +5,7 @@ var UuidCache = require("./UuidCache");
 var util = require("./utils");
 var _ = require('lodash');
 var MinecraftServer = require("./MinecraftServer");
+var MinecraftBot = require("./MinecraftBot");
 
 /**
  * The main entry point for the application - bootstraps the bridge on both sides
@@ -23,6 +24,8 @@ class MinecraftBridge {
         this._dataStore = null; // DataStore
         this._appServiceUserId = null; // string
         this._started = false;
+        this._bots = {}; // { serverString: MinecraftBot }
+        this._botsByRoom = {}; // { roomId: [MinecraftBot] }
 
         this._bridge = new Bridge({
             registration: this._registration,
@@ -64,6 +67,10 @@ class MinecraftBridge {
      */
     _getIntent() {
         return this._bridge.getIntent(this._appServiceUserId);
+    }
+
+    getMinecraftUser(uuid) {
+        return this._bridge.getIntentFromLocalpart("_minecraft_" + uuid);
     }
 
     /**
@@ -181,9 +188,9 @@ class MinecraftBridge {
             } else {
                 // There's more than 1 member - we probably need to bridge this room
                 this._dataStore.getServersForRoom(roomId).then(servers=> {
-                    // TODO: Remove dangerous hack and figure out why servers is empty
-                    if (roomId == "!FjHRlFicGIXDQfZpQU:dev.t2bot.io")
-                        servers.push(new MinecraftServer("mc.hypixel.net", 25565));
+                    // TODO: Figure out why servers is empty
+                    if (roomId == '!FIsyxUiElyPmkzfHaQ:dev.t2bot.io')
+                        servers = [new MinecraftServer('localhost', 54990)];
                     for (var server of servers) {
                         this._bridgeRoom(roomId, server);
                     }
@@ -212,8 +219,25 @@ class MinecraftBridge {
         log.info("MinecraftBridge - _bridgeRoom", "Starting bridge to " + mcServer.getHostname() + ":" + mcServer.getPort() + " to room " + roomId);
         this._updateRoomAspects(roomId, mcServer); // don't care about return value - we're just going to try and update the room state
 
-        // TODO: Actually bridge room
+        var key = mcServer.friendlyName();
+        if (this._bots[key]) {
+            log.warn("MinecraftBridge", "Bot class seems to already exist for server " + key + ". Recreating");
+        }
+
+        try {
+            var bot = new MinecraftBot(mcServer, this, roomId);
+            bot.start(this._config.mcBridge.mojangAccount.username, this._config.mcBridge.mojangAccount.password);
+
+            this._bots[key] = bot;
+
+            if (!this._botsByRoom[roomId])
+                this._botsByRoom[roomId] = [];
+            this._botsByRoom[roomId].push(bot);
+        } catch (e) {
+            log.error("MinecraftBridge", "Failed to create bridge to room " + roomId + " to server " + mcServer.friendlyName());
+        }
     }
+
 
     /**
      * Updates components of the room to be more in line with the current Minecraft server's status, such as the room's
@@ -223,7 +247,7 @@ class MinecraftBridge {
      * @returns {Promise<*>} resolves when the update has completed
      * @private
      */
-    _updateRoomAspects(roomId, mcServer){
+    _updateRoomAspects(roomId, mcServer) {
         return mcServer.ping().then(pingInfo => {
             var item = JSON.parse(localStorage.getItem("server." + mcServer.getHostname() + "." + mcServer.getPort()) || "{}");
             if (item.motd != pingInfo.motd || item.favicon_b64 != pingInfo.favicon_b64) {
@@ -253,10 +277,12 @@ class MinecraftBridge {
 
     _onEvent(request, context) {
         var event = request.getData();
-        //console.log(event);
 
         if (event.type === "m.room.message") {
-            // TODO: Process message event
+            var rooms = this._botsByRoom[event.room_id] || [];
+            for (var bot of rooms) {
+                bot.sendMessage(event.sender, event.content.body);
+            }
         } else if (event.type === "m.room.member") {
             if (event.state_key == this._appServiceUserId) {
                 if (event.content.membership === "invite") {
@@ -266,6 +292,7 @@ class MinecraftBridge {
                     });
                 }
             }
+            // TODO: Update when room no longer becomes an admin room
         }
 
         // Default

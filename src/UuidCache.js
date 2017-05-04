@@ -4,15 +4,16 @@ var log = require('npmlog');
 
 class UuidCache {
     constructor() {
-        this._cache = {};
+        this._uuidCache = {};
+        this._nameCache = {};
     }
 
     lookupFromUuid(uuid) {
         uuid = uuid.replace(/-/g, '');
 
         var generate = true;
-        if (this._cache.hasOwnProperty(uuid)) {
-            if (moment().isBefore(this._cache[uuid].expires)) {
+        if (this._uuidCache.hasOwnProperty(uuid)) {
+            if (moment().isBefore(this._uuidCache[uuid].expires)) {
                 generate = false;
             }
         }
@@ -25,12 +26,14 @@ class UuidCache {
                         return;
                     }
 
-                    this._cache[uuid] = {
+                    this._uuidCache[uuid] = {
                         profile: new PlayerInfo(profile.id, profile.name),
                         expires: moment().add(4, 'hours')
                     };
 
-                    resolve(this._cache[uuid].profile);
+                    this._nameCache[profile.name] = this._uuidCache[uuid];
+
+                    resolve(this._uuidCache[uuid].profile);
                 }, error => {
                     log.error("UuidCache", "Could not lookup profile for '" + uuid + "'");
                     log.error("UuidCache", error);
@@ -39,9 +42,39 @@ class UuidCache {
             });
         } else {
             return new Promise((resolve, reject) => {
-                var profile = this._cache[uuid];
+                var profile = this._uuidCache[uuid];
                 if (profile)resolve(profile.profile);
                 else reject(new Error("Profile not found: " + uuid));
+            });
+        }
+    }
+
+    lookupFromName(name) {
+        var generate = true;
+        if (this._nameCache.hasOwnProperty(name)) {
+            if (moment().isBefore(this._nameCache[name].expires)) {
+                generate = false;
+            }
+        }
+
+        if (generate) {
+            return new Promise((resolve, reject) => {
+                mojang.username(name).then(profile => {
+                    this._nameCache[name] = {
+                        profile: new PlayerInfo(profile.id, profile.name),
+                        expires: moment().add(4, 'hours')
+                    };
+
+                    this._uuidCache[profile.id] = this._nameCache[name];
+
+                    resolve(this._nameCache[name].profile);
+                }, err => reject(err));
+            });
+        } else {
+            return new Promise((resolve, reject) => {
+                var profile = this._nameCache[name];
+                if (profile)resolve(profile.profile);
+                else reject(new Error("Profile not found: " + name));
             });
         }
     }
