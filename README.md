@@ -1,5 +1,7 @@
 # matrix-appservice-minecraft
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/turt2live/matrix-appservice-minecraft.svg)](https://greenkeeper.io/)
+
 Minecraft bridge for [[Matrix]](https://matrix.org).
 
 Matrix room: [#minecraft-bridge:matrix.org](https://matrix.to/#/#minecraft-bridge:matrix.org)
