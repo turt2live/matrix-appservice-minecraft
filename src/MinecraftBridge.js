@@ -1,5 +1,6 @@
 var Bridge = require("matrix-appservice-bridge").Bridge;
 var RemoteRoom = require("matrix-appservice-bridge").RemoteRoom;
+var RemoteUser = require("matrix-appservice-bridge").RemoteUser;
 var log = require("./LogService");
 var UuidCache = require("./../src/UuidCache");
 var util = require("./utils");
@@ -29,8 +30,7 @@ class MinecraftBridge {
             domain: this._config.homeserver.domain,
             controller: {
                 onEvent: this._onEvent.bind(this),
-                onUserQuery: () => {
-                },
+                onUserQuery: this._onUserQuery.bind(this),
                 onAliasQuery: this._onAliasQuery.bind(this),
                 onAliasQueried: this._onAliasQueried.bind(this),
                 onLog: (line, isError) => {
@@ -40,8 +40,7 @@ class MinecraftBridge {
 
                 // TODO: thirdPartyLookup support?
             },
-            disableContext: true,
-            suppressEcho: true,
+            suppressEcho: false,
             queue: {
                 type: "none",
                 perRequest: false
@@ -69,7 +68,14 @@ class MinecraftBridge {
     }
 
     getMcUserIntent(uuid) {
-        return this._bridge.getIntentFromLocalpart("_minecraft_" + uuid);
+        var intent = this._bridge.getIntentFromLocalpart("_minecraft_" + uuid);
+
+        intent.getProfileInfo(intent.getClient().credentials.userId, null).then(profile => {
+            if (!profile.displayname || !profile.avatar_url)
+                this._updateUserProfile(intent, uuid);
+        });
+
+        return intent;
     }
 
     _updateBotProfile() {
@@ -98,6 +104,16 @@ class MinecraftBridge {
                 log.info("MinecraftBridge", "Updating display name from '" + profile.displayname + "' to '" + desiredDisplayName + "'");
                 botIntent.setDisplayName(desiredDisplayName);
             }
+        });
+    }
+
+    _updateUserProfile(intent, uuid) {
+        return UuidCache.lookupFromUuid(uuid).then(profile => {
+            var displayName = (profile ? profile.displayName : uuid) + " (Minecraft)";
+            return util.uploadContentFromUrl(this._bridge, 'https://crafatar.com/renders/head/' + uuid, intent).then(mxcUrl => {
+                intent.setAvatarUrl(mxcUrl);
+                intent.setDisplayName(displayName);
+            });
         });
     }
 
@@ -145,7 +161,7 @@ class MinecraftBridge {
             }
         } else if (event.type == "m.room.message") {
             // Ignore messages from the bridge
-            if (event.sender.indexOf("_minecraft_") === 0) return Promise.resolve();
+            if (event.sender.indexOf("@_minecraft_") === 0) return Promise.resolve();
 
             var bots = this._roomsToBots[event.room_id];
             if (!bots || bots.length <= 0) return Promise.resolve(); // early return: no bots
@@ -249,6 +265,20 @@ class MinecraftBridge {
         }).catch(err => {
             log.error("MinecraftBridge", "Failed to create room for alias #" + aliasLocalpart);
             log.error("MinecraftBridge", err);
+        });
+    }
+
+    _onUserQuery(matrixUser) {
+        var uuid = matrixUser.localpart.substring('_minecraft_'.length); // no dashes in uuid
+        return UuidCache.lookupFromUuid(uuid).then(profile => {
+            if (!profile) return {name: uuid + ' (Minecraft)'};
+            return util.uploadContentFromUrl(this._bridge, 'https://crafatar.com/renders/head/' + uuid, uuid).then(mxcUrl => {
+                return {
+                    name: profile.displayName + " (Minecraft)",
+                    remote: new RemoteUser(matrixUser.localpart),
+                    url: mxcUrl
+                };
+            });
         });
     }
 }

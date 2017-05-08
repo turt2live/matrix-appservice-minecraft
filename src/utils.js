@@ -23,6 +23,7 @@ var parseDataUri = require("parse-data-uri");
  * @return {Promise<string>} Promise resolving with a MXC URL.
  */
 function uploadContentFromUrl(bridge, url, id, name) {
+    log.verbose("utils", "Downloading image from " + url);
     var contenttype;
     id = id || null;
     name = name || null;
@@ -34,7 +35,7 @@ function uploadContentFromUrl(bridge, url, id, name) {
             if (res.headers.hasOwnProperty("content-type")) {
                 contenttype = res.headers["content-type"];
             } else {
-                log.info("No content-type given by server, guessing based on file name.");
+                log.info("utils", "No content-type given by server, guessing based on file name.");
                 contenttype = mime.lookup(url);
             }
 
@@ -44,8 +45,8 @@ function uploadContentFromUrl(bridge, url, id, name) {
             }
             var size = parseInt(res.headers["content-length"]);
             if (isNaN(size)) {
-                reject("Content-Length was not an integer, which is weird.");
-                return;
+                log.warn("UploadContentFromUrl", "Content-length is not valid. Assuming 512kb size");
+                size = 512 * 1024;
             }
             var buffer;
             if (Buffer.alloc) {//Since 5.10

@@ -33,13 +33,13 @@ class MinecraftBot {
             password: password
         });
 
-        // this._bot.on('chat', (username, message) => {
-        //     if (username == this._bot.username) return; // self
-        //
-        //     UuidCache.lookupFromName(username).then(profile => {
-        //         this._bridge.getMinecraftUser(profile.uuid).sendText(this._roomId, message.toString());
-        //     });
-        // });
+        this._bot.on('chat', (username, message) => {
+            if (username == this._bot.username) return; // self
+
+            UuidCache.lookupFromName(username).then(profile => {
+                this._bridge.getMcUserIntent(profile.uuid).sendText(this._roomId, message.toString());
+            });
+        });
         //
         // this._bot.on('playerJoined', (player) => {
         //     if (player.username == this._bot.username) return; // self
