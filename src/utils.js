@@ -4,7 +4,7 @@
 var https = require('https');
 var http = require('http');
 var Buffer = require("buffer").Buffer;
-var log = require('npmlog');
+var log = require('./LogService');
 var mime = require('mime');
 var parseDataUri = require("parse-data-uri");
 
@@ -77,10 +77,10 @@ function uploadContentFromUrl(bridge, url, id, name) {
         });
     }).then((response) => {
         var content_uri = JSON.parse(response).content_uri;
-        log.info("UploadContent", "Media uploaded to %s", content_uri);
+        log.info("UploadContent", "Media uploaded to " + content_uri);
         return content_uri;
     }).catch(function (reason) {
-        log.error("UploadContent", "Failed to upload content:\n%s", reason)
+        log.error("UploadContent", "Failed to upload content:\n" + reason)
     });
 }
 
@@ -102,10 +102,10 @@ function uploadContentFromDataUri(bridge, id, uri, name) {
         type: parsed.mimeType
     }).then(response=> {
         var content_uri = JSON.parse(response).content_uri;
-        log.info("uploadContentFromDataUri", "Media uploaded to %s", content_uri);
+        log.info("uploadContentFromDataUri", "Media uploaded to " + content_uri);
         return content_uri;
     }).catch(function (reason) {
-        log.error("UploadContent", "Failed to upload content:\n%s", reason)
+        log.error("UploadContent", "Failed to upload content:\n" + reason)
     });
 }
 

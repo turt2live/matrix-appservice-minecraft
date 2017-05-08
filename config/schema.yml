@@ -8,8 +8,6 @@ properties:
         type: "string"
       url:
         type: "string"
-      mediaUrl:
-        type: "string"
   mcBridge:
     type: "object"
     properties:
@@ -27,3 +25,21 @@ properties:
             type: "string"
           avatarUrl:
             type: "string"
+  logging:
+    type: "object"
+    properties:
+      file:
+        type: "string"
+      console:
+        type: "boolean"
+      consoleLevel:
+        type: "string"
+      fileLevel:
+        type: "string"
+      rotate:
+        type: "object"
+        properties:
+          size:
+            type: "number"
+          count:
+            type: "number"

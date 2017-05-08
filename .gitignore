@@ -5,6 +5,9 @@ minecraft-registration.yaml
 appservice-registration-minecraft.yaml
 rooms.db
 users.db
+room-store.db
+user-store.db
+minecraft-*.db
 account_data
 
 # Logs

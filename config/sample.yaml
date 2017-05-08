@@ -7,10 +7,6 @@ homeserver:
   # home server's URL.
   domain: "localhost"
 
-  # The URL of the homeserver hosting media files. This is only used to transform uploaded content to
-  # messages for bridged users. If not specified, the `url` for the client-server API is used.
-  #mediaUrl: "http://localhost:8008"
-
 # Configuration specific to the bridge. All fields (unless otherwise marked) are required.
 mcBridge:
   # The credentials to the Mojang account with Minecraft purchased. These credentials are used when the
@@ -23,3 +19,12 @@ mcBridge:
   appearance:
     displayName: "Minecraft Bridge"
     avatarUrl: "http://i.imgur.com/ELbV0Af.png" # grass block
+
+logging:
+  file: logs/minecraft.log
+  console: true
+  consoleLevel: info
+  fileLevel: verbose
+  rotate:
+    size: 52428800 # bytes, default is 50mb
+    count: 5

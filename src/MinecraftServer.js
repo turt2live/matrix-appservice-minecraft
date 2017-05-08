@@ -45,9 +45,9 @@ class MinecraftServer extends RemoteRoom {
      * @returns {Promise<{ motd: string, favicon_b64: string}>} a promise that resolves to the ping response. Rejected if offline
      */
     ping() {
-        return new Promise((resolve, reject)=>{
-            mcutils.ping(this.getHostname(), this.getPort(), function(err, response) {
-                if(err) reject(err);
+        return new Promise((resolve, reject)=> {
+            mcutils.ping(this.getHostname(), this.getPort(), function (err, response) {
+                if (err) reject(err);
                 else {
                     resolve({
                         motd: response.description,
@@ -68,10 +68,21 @@ class MinecraftServer extends RemoteRoom {
     friendlyName() {
         var hostname = this.getHostname();
 
-        if(this.getPort()!=25565)
-            hostname+=":"+this.getPort();
+        if (this.getPort() != 25565)
+            hostname += ":" + this.getPort();
 
         return hostname;
+    }
+
+    /**
+     * Gets the full name for this server.
+     * Examples:
+     * * mc.turt2live.com:25565
+     * * mc.turt2live.com:1122
+     * @returns {string} the server's full name
+     */
+    fullName() {
+        return this.getHostname() + ":" + this.getPort();
     }
 
     /**
@@ -82,11 +93,20 @@ class MinecraftServer extends RemoteRoom {
     static createServersFromRemote(remoteRooms) {
         var newRooms = [];
 
-        for(var room of remoteRooms) {
-            newRooms.push(new MinecraftServer(room.get("hostname"), room.get("port")));
+        for (var room of remoteRooms) {
+            newRooms.push(new MinecraftServer(room.get("minecraft_hostname"), room.get("minecraft_port")));
         }
 
         return newRooms;
+    }
+
+    /**
+     * Creates MinecraftServer from a remote room
+     * @param {RemoteRoom} remoteRoom the matrix bridge remote room
+     * @returns {MinecraftServer} the minecraft server
+     */
+    static createServerFromRemote(remoteRoom) {
+        return new MinecraftServer(remoteRoom.get("minecraft_hostname"), remoteRoom.get("minecraft_port"));
     }
 }
 

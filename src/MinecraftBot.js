@@ -1,5 +1,5 @@
 var mineflayer = require('mineflayer');
-var log = require("npmlog");
+var log = require("./LogService");
 var UuidCache = require("./UuidCache");
 
 /**
@@ -33,32 +33,31 @@ class MinecraftBot {
             password: password
         });
 
-        this._bot.on('chat', (username, message) => {
-            if (username == this._bot.username) return; // self
-
-            UuidCache.lookupFromName(username).then(profile => {
-                this._bridge.getMinecraftUser(profile.uuid).sendText(this._roomId, message.toString());
-            });
-        });
-
-        this._bot.on('playerJoined', (player) => {
-            if (player.username == this._bot.username) return; // self
-
-            UuidCache.lookupFromName(player.username).then(profile => {
-                var intent = this._bridge.getMinecraftUser(profile.uuid);
-                intent.join(this._roomId);
-            });
-        });
+        // this._bot.on('chat', (username, message) => {
+        //     if (username == this._bot.username) return; // self
+        //
+        //     UuidCache.lookupFromName(username).then(profile => {
+        //         this._bridge.getMinecraftUser(profile.uuid).sendText(this._roomId, message.toString());
+        //     });
+        // });
+        //
+        // this._bot.on('playerJoined', (player) => {
+        //     if (player.username == this._bot.username) return; // self
+        //
+        //     UuidCache.lookupFromName(player.username).then(profile => {
+        //         var intent = this._bridge.getMinecraftUser(profile.uuid);
+        //         intent.join(this._roomId);
+        //     });
+        // });
     }
 
     /**
      * Sends a message to the Minecraft server, as the particular sender
-     * @param {MatrixUser} sender the sender of the message
+     * @param {{displayname: string, avatar_url: string, user_id: string}} sender the sender of the message
      * @param {string} message the plain text message sent
      */
     sendMessage(sender, message) {
-        if (sender.indexOf("@_minecraft_") === 0) return; // skip
-        this._bot.chat("<" + sender + "> " + message);
+        this._bot.chat("<" + (sender.displayname || sender.user_id) + "> " + message);
     }
 }
 

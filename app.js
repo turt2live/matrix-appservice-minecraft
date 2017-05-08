@@ -1,11 +1,8 @@
 var Cli = require("matrix-appservice-bridge").Cli;
 var AppServiceRegistration = require("matrix-appservice-bridge").AppServiceRegistration;
-var log = require("npmlog");
+var log = require("./src/LogService");
 var path = require("path");
 var MinecraftBridge = require("./src/MinecraftBridge");
-var LocalStorage = require("node-localstorage").LocalStorage;
-
-global.localStorage = new LocalStorage("./account_data"); // TODO: Should probably replace localstorage with a real database
 
 new Cli({
     registrationPath: "appservice-registration-minecraft.yaml",
@@ -13,7 +10,7 @@ new Cli({
     enableLocalpart: true,
     bridgeConfig: {
         affectsRegistration: true,
-        schema: path.join(__dirname, "src/config-schema.yml"),
+        schema: path.join(__dirname, "config/schema.yml"),
         defaults: {
             homeserver: {
                 url: "http://localhost:8008",
@@ -24,6 +21,16 @@ new Cli({
                 mojangAccount: {
                     username: "myemail@example.com",
                     password: "MySecretPassw0rd"
+                }
+            },
+            logging: {
+                file: "logs/minecraft.log",
+                console: true,
+                consoleLevel: 'info',
+                fileLevel: 'verbose',
+                rotate: {
+                    size: 52428800,
+                    count: 5
                 }
             }
         }
@@ -44,6 +51,7 @@ new Cli({
         callback(registration);
     },
     run: function (port, config, registration) {
+        log.init(config);
         var bridge = new MinecraftBridge(config, registration);
         bridge.run(port).catch(err => {
             log.error("Init", "Failed to start bridge");

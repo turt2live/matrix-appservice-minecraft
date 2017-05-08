@@ -1,6 +1,6 @@
 var mojang = require('mojang');
 var moment = require('moment');
-var log = require('npmlog');
+var log = require('./LogService');
 
 class UuidCache {
     constructor() {
