@@ -2,11 +2,12 @@ var mineflayer = require('mineflayer');
 var log = require("./../util/LogService");
 var UuidCache = require("./UuidCache");
 var Q = require("q");
+var EventEmitter = require("events").EventEmitter;
 
 /**
  * Represents a connection to a Minecraft server
  */
-class MinecraftBot {
+class MinecraftBot extends EventEmitter {
 
     /**
      * Sets up a new Minecraft bot
@@ -15,6 +16,8 @@ class MinecraftBot {
      * @param {string} roomId the room ID being bridged to
      */
     constructor(mcServer, bridge, roomId) {
+        super();
+
         this._server = mcServer;
         this._bot = null;
         this._bridge = bridge;
@@ -53,6 +56,8 @@ class MinecraftBot {
                     this._bridge.getMcUserIntent(profile.uuid).sendText(this._roomId, message.toString());
                 });
             });
+
+            this._bot.on('end', () => this.emit('disconnect'));
             //
             // this._bot.on('playerJoined', (player) => {
             //     if (player.username == this._bot.username) return; // self

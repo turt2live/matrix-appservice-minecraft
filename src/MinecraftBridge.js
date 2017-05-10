@@ -25,6 +25,7 @@ class MinecraftBridge {
         this._config = config;
         this._registration = registration;
         this._roomsToBots = {}; // {roomId: [bot]}
+        this._retryRooms = []; // room IDs that failed to bridge
 
         this._bridge = new Bridge({
             registration: this._registration,
@@ -58,6 +59,8 @@ class MinecraftBridge {
         });
 
         PubSub.subscribe('profileUpdate', this._onProfileUpdate.bind(this));
+
+        setTimeout(this._retryBridging.bind(this), 60 * 1000); // once a minute
     }
 
     run(port) {
@@ -153,12 +156,38 @@ class MinecraftBridge {
                 if (!this._roomsToBots[roomId])
                     this._roomsToBots[roomId] = [];
                 this._roomsToBots[roomId].push(bot);
+
+                bot.on('disconnect', () => {
+                    log.warn("MinecraftBridge", "Lost connection to server " + server.fullName() + " - queuing retry to room " + roomId);
+                    this._retryRooms.push(roomId);
+                });
             }, _ => {
                 log.warn("MinecraftBridge", "Error bridging room " + roomId + " to " + server.fullName());
+                log.warn("MinecraftBridge", "Queuing retry to room " + roomId);
+                this._retryRooms.push(roomId);
             });
         } catch (e) {
             log.error("MinecraftBridge", "Error bridging room " + roomId + " to " + server.fullName());
             log.error("MinecraftBridge", e);
+            log.warn("MinecraftBridge", "Queuing retry to room " + roomId);
+            this._retryRooms.push(roomId);
+        }
+    }
+
+    _retryBridging() {
+        var rooms = [];
+        while(this._retryRooms.length > 0){
+            var roomId = this._retryRooms[0];
+            if(rooms.indexOf(roomId) === -1)
+                rooms.push(roomId);
+            this._retryRooms.splice(0, 1);
+        }
+
+        this._retryRooms = [];
+
+        log.info("MinecraftBridge", "Retrying bridge to " + rooms.length + " rooms");
+        for (var roomId of rooms) {
+            this._processRoom(roomId);
         }
     }
 
