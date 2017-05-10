@@ -34,11 +34,13 @@ function getTimestamp() {
 var log = null;
 
 function doLog(level, module, messageOrObject) {
-    if (!log) throw new Error("Log not initialized");
-    if (typeof(messageOrObject) === 'object')
+    if (typeof(messageOrObject) === 'object' && !(messageOrObject instanceof Error))
         messageOrObject = JSON.stringify(messageOrObject);
     var message = "[" + module + "] " + messageOrObject;
-    log.log(level, message);
+
+    if (!log) {
+        console.log("[preinit] " + getTimestamp() + " - " + level + " - " + message);
+    } else log.log(level, message);
 }
 
 class LogService {

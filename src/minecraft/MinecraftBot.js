@@ -37,6 +37,7 @@ class MinecraftBot {
                 password: password
             });
             this._bot.on('error', error => {
+                log.error("MinecraftBot", "Error connecting bot for room " + this._roomId + " to server " + this._server.fullName());
                 log.error("MinecraftBot", error);
                 deferred.reject(error);
             });
@@ -62,6 +63,7 @@ class MinecraftBot {
             //     });
             // });
         } catch (e) {
+            log.error("MinecraftBot", "Error starting bot for room " + this._roomId + " at server " + this._server.fullName());
             log.error("MinecraftBot", e);
             deferred.reject(e);
         }

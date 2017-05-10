@@ -9,6 +9,7 @@ room-store.db
 user-store.db
 minecraft-*.db
 account_data
+uuidcache.json
 
 # Logs
 logs
