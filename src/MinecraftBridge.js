@@ -135,20 +135,28 @@ class MinecraftBridge {
 
             for (var room of remoteRooms) {
                 var server = MinecraftServer.createServerFromRemote(room);
-                try {
-                    log.info("MinecraftBridge", "Bridging room " + roomId + " to " + server.fullName());
-                    var bot = new MinecraftBot(server, this, roomId);
-                    bot.start(this._config.mcBridge.mojangAccount.username, this._config.mcBridge.mojangAccount.password);
-
-                    if (!this._roomsToBots[roomId])
-                        this._roomsToBots[roomId] = [];
-                    this._roomsToBots[roomId].push(bot);
-                } catch (e) {
-                    log.error("MinecraftBridge", "Error bridging room " + roomId + " to " + server.fullName());
-                    log.error("MinecraftBridge", e);
-                }
+                this._processBot(server, roomId);
             }
         });
+    }
+
+    _processBot(server, roomId) {
+        try {
+            log.info("MinecraftBridge", "Bridging room " + roomId + " to " + server.fullName());
+            var bot = new MinecraftBot(server, this, roomId);
+            bot.start(this._config.mcBridge.mojangAccount.username, this._config.mcBridge.mojangAccount.password).then(() => {
+                log.info("MinecraftBridge", "Bot connected OK to " + server.fullName() + " (bridged to room " + roomId + ")");
+
+                if (!this._roomsToBots[roomId])
+                    this._roomsToBots[roomId] = [];
+                this._roomsToBots[roomId].push(bot);
+            }, _ => {
+                log.warn("MinecraftBridge", "Error bridging room " + roomId + " to " + server.fullName());
+            });
+        } catch (e) {
+            log.error("MinecraftBridge", "Error bridging room " + roomId + " to " + server.fullName());
+            log.error("MinecraftBridge", e);
+        }
     }
 
     _onEvent(request, context) {
