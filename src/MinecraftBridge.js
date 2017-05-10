@@ -7,6 +7,8 @@ var util = require("./utils");
 var _ = require('lodash');
 var MinecraftServer = require("./minecraft/MinecraftServer");
 var MinecraftBot = require("./minecraft/MinecraftBot");
+var ProfileService = require("./minecraft/ProfileService");
+var PubSub = require("pubsub-js");
 
 /**
  * The main entry point for the application - bootstraps the bridge on both sides
@@ -54,6 +56,8 @@ class MinecraftBridge {
                 }
             }
         });
+
+        PubSub.subscribe('profileUpdate', this._onProfileUpdate.bind(this));
     }
 
     run(port) {
@@ -69,12 +73,7 @@ class MinecraftBridge {
 
     getMcUserIntent(uuid) {
         var intent = this._bridge.getIntentFromLocalpart("_minecraft_" + uuid);
-
-        intent.getProfileInfo(intent.getClient().credentials.userId, null).then(profile => {
-            if (!profile.displayname || !profile.avatar_url)
-                this._updateUserProfile(intent, uuid);
-        });
-
+        ProfileService.queueProfileCheck(uuid); // to make sure their profile is updated
         return intent;
     }
 
@@ -107,14 +106,18 @@ class MinecraftBridge {
         });
     }
 
-    _updateUserProfile(intent, uuid) {
-        return UuidCache.lookupFromUuid(uuid).then(profile => {
-            var displayName = (profile ? profile.displayName : uuid) + " (Minecraft)";
-            return util.uploadContentFromUrl(this._bridge, 'https://crafatar.com/renders/head/' + uuid, intent).then(mxcUrl => {
-                intent.setAvatarUrl(mxcUrl);
-                intent.setDisplayName(displayName);
-            });
-        });
+    _onProfileUpdate(topic, changes) {
+        var intent = this.getMcUserIntent(changes.uuid);
+        if (changes.changed == 'displayName') {
+            intent.setDisplayName(changes.profile.displayName + " (Minecraft)");
+        } else if (changes.changed == 'avatar') {
+            intent.getClient().uploadContent({
+                rawResponse: false,
+                stream: changes.newAvatar,
+                name: changes.uuid,
+                type: 'image/png' // assumed - probably a bad idea
+            }).then(response => intent.setAvatarUrl(response.content_uri));
+        } else log.warn("MinecraftBridge", "Unrecongized profile update: " + changes.changed);
     }
 
     _bridgeKnownRooms() {
@@ -277,16 +280,11 @@ class MinecraftBridge {
     }
 
     _onUserQuery(matrixUser) {
+        // Avatar and name will eventually make it back to us from the profile service.
         var uuid = matrixUser.localpart.substring('_minecraft_'.length); // no dashes in uuid
-        return UuidCache.lookupFromUuid(uuid).then(profile => {
-            if (!profile) return {name: uuid + ' (Minecraft)'};
-            return util.uploadContentFromUrl(this._bridge, 'https://crafatar.com/renders/head/' + uuid, uuid).then(mxcUrl => {
-                return {
-                    name: profile.displayName + " (Minecraft)",
-                    remote: new RemoteUser(matrixUser.localpart),
-                    url: mxcUrl
-                };
-            });
+        ProfileService.queueProfileCheck(uuid);
+        return Promise.resolve({
+            remote: new RemoteUser(matrixUser.localpart)
         });
     }
 }
