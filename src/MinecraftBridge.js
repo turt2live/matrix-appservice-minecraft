@@ -60,7 +60,7 @@ class MinecraftBridge {
 
         PubSub.subscribe('profileUpdate', this._onProfileUpdate.bind(this));
 
-        setTimeout(this._retryBridging.bind(this), 60 * 1000); // once a minute
+        setInterval(this._retryBridging.bind(this), 60 * 1000); // once a minute
     }
 
     run(port) {
