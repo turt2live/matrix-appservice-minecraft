@@ -1,6 +1,6 @@
 var Cli = require("matrix-appservice-bridge").Cli;
 var AppServiceRegistration = require("matrix-appservice-bridge").AppServiceRegistration;
-var log = require("./src/LogService");
+var log = require("./src/util/LogService");
 var path = require("path");
 var MinecraftBridge = require("./src/MinecraftBridge");
 

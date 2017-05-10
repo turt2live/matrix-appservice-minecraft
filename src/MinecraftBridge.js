@@ -1,12 +1,12 @@
 var Bridge = require("matrix-appservice-bridge").Bridge;
 var RemoteRoom = require("matrix-appservice-bridge").RemoteRoom;
 var RemoteUser = require("matrix-appservice-bridge").RemoteUser;
-var log = require("./LogService");
-var UuidCache = require("./../src/UuidCache");
+var log = require("./util/LogService");
+var UuidCache = require("./minecraft/UuidCache");
 var util = require("./utils");
 var _ = require('lodash');
-var MinecraftServer = require("./MinecraftServer");
-var MinecraftBot = require("./MinecraftBot");
+var MinecraftServer = require("./minecraft/MinecraftServer");
+var MinecraftBot = require("./minecraft/MinecraftBot");
 
 /**
  * The main entry point for the application - bootstraps the bridge on both sides

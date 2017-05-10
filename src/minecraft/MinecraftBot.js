@@ -1,5 +1,5 @@
 var mineflayer = require('mineflayer');
-var log = require("./LogService");
+var log = require("./../util/LogService");
 var UuidCache = require("./UuidCache");
 
 /**
