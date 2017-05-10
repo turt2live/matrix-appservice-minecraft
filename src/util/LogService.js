@@ -34,7 +34,7 @@ function getTimestamp() {
 var log = null;
 
 function doLog(level, module, messageOrObject) {
-    if (typeof(messageOrObject) === 'object')
+    if (typeof(messageOrObject) === 'object' && !(messageOrObject instanceof Error))
         messageOrObject = JSON.stringify(messageOrObject);
     var message = "[" + module + "] " + messageOrObject;
 
