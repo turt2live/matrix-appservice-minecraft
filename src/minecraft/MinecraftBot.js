@@ -49,11 +49,27 @@ class MinecraftBot extends EventEmitter {
                 deferred.resolve();
             });
 
-            this._bot.on('chat', (username, message) => {
+            this._bot.on('chat', (username, message, translate, jsonMessage) => {
                 if (username == this._bot.username) return; // self
 
                 UuidCache.lookupFromName(username).then(profile => {
+                    // TODO: HTML formatting on message (jsonMessage)
                     this._bridge.getMcUserIntent(profile.uuid).sendText(this._roomId, message.toString());
+                });
+            });
+
+            this._bot.on('message', jsonMessage => {
+                if (jsonMessage.translate != "chat.type.emote") return; // not an emote
+
+                var username = jsonMessage.with[0].toString(); // assumed username
+                var message = jsonMessage.with.splice(1).map(i => i.toString()).join(" ");
+
+                UuidCache.lookupFromName(username).then(profile => {
+                    // TODO: HTML formatting on message
+                    this._bridge.getMcUserIntent(profile.uuid).sendMessage(this._roomId, {
+                        body: message,
+                        msgtype: "m.emote"
+                    });
                 });
             });
 
