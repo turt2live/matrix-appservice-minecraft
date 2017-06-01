@@ -1,6 +1,7 @@
 # matrix-appservice-minecraft
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/turt2live/matrix-appservice-minecraft.svg)](https://greenkeeper.io/) [![TravisCI badge](https://travis-ci.org/turt2live/matrix-appservice-minecraft.svg?branch=master)](https://travis-ci.org/turt2live/matrix-appservice-minecraft)
+[![Targeted for next release](https://badge.waffle.io/turt2live/matrix-appservice-minecraft.png?label=sorted&title=Targeted+for+next+release)](https://waffle.io/turt2live/waffle-matrix?utm_source=badge) [![WIP](https://badge.waffle.io/turt2live/matrix-appservice-minecraft.png?label=wip&title=WIP)](https://waffle.io/turt2live/waffle-matrix?utm_source=badge)
 
 Minecraft bridge for [[Matrix]](https://matrix.org).
 
