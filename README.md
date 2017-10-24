@@ -1,12 +1,12 @@
 # matrix-appservice-minecraft
 
 [![TravisCI badge](https://travis-ci.org/turt2live/matrix-appservice-minecraft.svg?branch=master)](https://travis-ci.org/turt2live/matrix-appservice-minecraft)
-[![Targeted for next release](https://badge.waffle.io/turt2live/matrix-appservice-minecraft.png?label=sorted&title=Targeted+for+next+release)](https://waffle.io/turt2live/waffle-matrix?utm_source=badge) 
-[![WIP](https://badge.waffle.io/turt2live/matrix-appservice-minecraft.png?label=wip&title=WIP)](https://waffle.io/turt2live/waffle-matrix?utm_source=badge)
 
 Minecraft bridge for [[Matrix]](https://matrix.org).
 
 Matrix room: [#minecraft-bridge:matrix.org](https://matrix.to/#/#minecraft-bridge:matrix.org)
+
+**Note**: This is a personal pet-project and won't see a whole lot of activity. Contributions are welcome, however :)
 
 # Requirements
 
