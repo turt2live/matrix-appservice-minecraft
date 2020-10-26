@@ -1,3 +1,9 @@
+# THIS PROJECT IS ABANDONED
+
+You're welcome to try and revive it, but to be honest you're better off starting from scratch.
+
+No maintenance is planned for this bridge.
+
 # matrix-appservice-minecraft
 
 [![TravisCI badge](https://travis-ci.org/turt2live/matrix-appservice-minecraft.svg?branch=master)](https://travis-ci.org/turt2live/matrix-appservice-minecraft)
